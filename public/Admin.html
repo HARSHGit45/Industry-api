@@ -107,6 +107,25 @@
     usecasesContainer.appendChild(div);
   }
 
+  async function deleteIndustry(industryName) {
+  if (!confirm(`Are you sure you want to delete "${industryName}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/industry/${encodeURIComponent(industryName)}`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) throw new Error('Failed to delete industry');
+
+    alert(`Industry "${industryName}" deleted.`);
+    fetchAndDisplayIndustries(); // Refresh list
+  } catch (err) {
+    console.error(err);
+    alert('Error deleting industry');
+  }
+}
+
+
   function addFeature() {
     const div = document.createElement('div');
     div.className = 'feature';
@@ -185,31 +204,35 @@
 
       industriesList.innerHTML = '';
       industries.forEach(ind => {
-        const card = document.createElement('div');
-        card.className = 'industry-card';
-        card.innerHTML = `
-          <h2>${ind.industry}</h2>
-          <p><strong>Title:</strong> ${ind.title}</p>
-          <p><strong>Tagline:</strong> ${ind.tagline}</p>
-          <h3>Usecases</h3>
-          ${ind.usecases.map(uc => `
-            <div class="usecase-item">
-              <h4>${uc.title}</h4>
-              <p><strong>Description:</strong> ${uc.description}</p>
-              <p><strong>Problem:</strong> ${uc.problem}</p>
-              <p><strong>Impact:</strong> ${uc.impact}</p>
-              <p><strong>Solution:</strong> ${uc.solution}</p>
-              <p><strong>IT Infrastructure:</strong> ${uc["IT Infrastructure"]}</p>
-              <p><strong>AI Development:</strong> ${uc["AI Development"]}</p>
-              <p><strong>Data Management:</strong> ${uc["Data Management"]}</p>
-              <p><strong>Data Security:</strong> ${uc["Data Security"]}</p>
-              <p><strong>Sustainability IT:</strong> ${uc["Sustainability IT"]}</p>
-            </div>`).join('')}
-          <h3>Features</h3>
-          <ul>${ind.feature.map(f => `<li>${f}</li>`).join('')}</ul>
-        `;
-        industriesList.appendChild(card);
-      });
+  const card = document.createElement('div');
+  card.className = 'industry-card';
+
+  card.innerHTML = `
+    <h2>${ind.industry}</h2>
+    <p><strong>Title:</strong> ${ind.title}</p>
+    <p><strong>Tagline:</strong> ${ind.tagline}</p>
+    <h3>Usecases</h3>
+    ${ind.usecases.map(uc => `
+      <div class="usecase-item">
+        <h4>${uc.title}</h4>
+        <p><strong>Description:</strong> ${uc.description}</p>
+        <p><strong>Problem:</strong> ${uc.problem}</p>
+        <p><strong>Impact:</strong> ${uc.impact}</p>
+        <p><strong>Solution:</strong> ${uc.solution}</p>
+        <p><strong>IT Infrastructure:</strong> ${uc["ITInfrastructure"]}</p>
+        <p><strong>AI Development:</strong> ${uc["AIDevelopment"]}</p>
+        <p><strong>Data Management:</strong> ${uc["DataManagement"]}</p>
+        <p><strong>Data Security:</strong> ${uc["DataSecurity"]}</p>
+        <p><strong>Sustainability IT:</strong> ${uc["SustainabilityIT"]}</p>
+      </div>`).join('')}
+    <h3>Features</h3>
+    <ul>${ind.feature.map(f => `<li>${f}</li>`).join('')}</ul>
+
+    <button onclick="deleteIndustry('${ind.industry}')">Delete</button>
+  `;
+  industriesList.appendChild(card);
+});
+
     } catch (error) {
       industriesList.innerHTML = '<p>Error loading industries.</p>';
       console.error(error);
